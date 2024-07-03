@@ -1,4 +1,3 @@
-import { useTabsDescendant } from "@chakra-ui/react";
 import useData from "./useData";
 
 
