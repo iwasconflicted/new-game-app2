@@ -1,31 +1,37 @@
+import { useQuery } from "@tanstack/react-query";
+import apiClient from "../services/apiClient";
 import { GameQuery } from "../App";
-import useData from "./useData";
-
-
-export interface Platform {
-  id: number;
-  name: string;
-  slug: string
-}
-
-
-//help us shaping our data in the form of our interfaces(type) props to pass data from parent component to child
+import { Platform } from "./usePlatforms";
+import { CACHE_KEY_GAME } from "../constant";
+// Define the Game interface as before
 export interface Game {
   id: number;
   name: string;
-  background_image: string
-  parent_platforms: { platform: Platform }[]
-  metacritic: number
+  background_image: string;
+  parent_platforms: { platform: Platform }[];
+  metacritic: number;
 }
-
 export interface FetchGameResponse {
   count: number;
   results: Game[];
 }
-
-
-const useGames = (gameQuery:GameQuery) => useData<Game>('/games',{params:{genres:gameQuery.genre?.id,parent_platforms:gameQuery.platform?.id, ordering:gameQuery.sortOrder, search:gameQuery.searchText}},[gameQuery])
-  
-
-
+// useGames hook refactored to use useQuery
+const useGames = (gameQuery: GameQuery) =>
+  useQuery(
+    [CACHE_KEY_GAME, gameQuery],
+    () =>
+      apiClient
+        .get<FetchGameResponse>("/games", {
+          params: {
+            genres: gameQuery.genre?.id,
+            parent_platforms: gameQuery.platform?.id,
+            ordering: gameQuery.sortOrder,
+            search: gameQuery.searchText,
+          },
+        })
+        .then(response => response.data),
+    {
+      staleTime: 24 * 60 * 60 * 1000,
+    }
+  );
 export default useGames;
