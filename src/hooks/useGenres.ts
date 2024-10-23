@@ -1,21 +1,20 @@
 import { useQuery } from "@tanstack/react-query"
-import useData from "./useData"
 import { CACHE_KEY_GENRE } from "../constant"
-import apiClient from "../services/apiClient"
+import APIClient, { FetchResponse } from "../services/apiClient"
 
-
-//help us shape our data in the form of our interfaces (type) props to pass data from parent component to child
+const apiClient = new APIClient<Genre>('/genres')
 export interface Genre {
     id: number
     name: string
     image_background:string
 }
-interface FetchGameResponse <T>  {
+export interface FetchGenreResponse <T>  {
     count: number
     results: T[];
 }
-const useGenres = () => useQuery({
+const useGenres = () => useQuery<FetchResponse<Genre>>({
     queryKey: CACHE_KEY_GENRE,
-    queryFn: () => apiClient.get<FetchGameResponse<Genre>>("/genres").then(res => res.data)
+    queryFn: () => apiClient.getAll({}),
+    staleTime: 24*60*60*1000 //24hrs
 })
 export default useGenres;

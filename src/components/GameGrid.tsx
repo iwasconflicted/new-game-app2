@@ -1,23 +1,27 @@
 ///All our imports we need
-import { SimpleGrid, Text } from "@chakra-ui/react";
+
+import { Button, SimpleGrid, Text } from "@chakra-ui/react";
 import useGames from "../hooks/useGames";
 import GameCard from "./GameCard";
 import GameCardSkeleton from "./GameCardSkeleton";
 import GameCardContainer from "./GameCardContainer";
+
 import { GameQuery } from "../App";
+import React from "react";
+
 interface Props {
-gameQuery: GameQuery
+  gameQuery: GameQuery;
 }
-const GameGrid = ({gameQuery}:Props) => {
-  //custom game hook
-  const { data, error, isLoading } = useGames(gameQuery);
-  //We other helper function to add, delete or update data
+
+const GameGrid = ({ gameQuery }: Props) => {
+  const { data, error, isLoading, isFetchingNextPage,fetchNextPage,hasNextPage } = useGames(gameQuery);
+
   const skeleton = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
   ];
+
   return (
     <>
-      {/* display our data ul li grid table usually map it with unique key  {1} 4px  */}
       <SimpleGrid
         columns={{ sm: 1, md: 2, lg: 3, xl: 4 }}
         spacing={3}
@@ -26,17 +30,25 @@ const GameGrid = ({gameQuery}:Props) => {
         {isLoading &&
           skeleton.map((skeleton) => (
             <GameCardContainer key={skeleton}>
-              <GameCardSkeleton  />
+              <GameCardSkeleton />
             </GameCardContainer>
           ))}
-        {data?.results.map((game) => (
-          <GameCardContainer key={game.id}>
-            <GameCard game={game} ></GameCard>
-          </GameCardContainer>
+
+        {data?.pages.map((page, index) => (
+          <React.Fragment key={index}>
+            {page?.results.map((game) => (
+              <GameCardContainer key={game.id}>
+                <GameCard game={game}></GameCard>
+              </GameCardContainer>
+            ))}
+          </React.Fragment>
         ))}
+
       </SimpleGrid>
-      {/* {error && <Text color={"red"}>{error}</Text>} */}
+
+      {hasNextPage && <Button onClick={()=> fetchNextPage()}>{isFetchingNextPage ? 'Loading...': 'Load More'}</Button>}
     </>
   );
 };
+
 export default GameGrid;
