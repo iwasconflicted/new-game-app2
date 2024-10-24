@@ -4,15 +4,18 @@ import NavBar from "./components/NavBar";
 import GameGrid from "./components/GameGrid";
 import GenreList from "./components/GenreList";
 import { useState } from "react";
-import { Genre } from "./hooks/useGenres";
 import PlatformSelector from "./components/PlatformSelector";
-import usePlatform, { Platform } from "../src/hooks/usePlatforms"
+import { Platform } from "../src/hooks/usePlatforms"
 import SortSelector from "./components/SortSelector";
 import GameHeading from "./components/GameHeading";
 
+
+// undefined is absence of value;
+// null: is an intentional absence of value
+
 export interface GameQuery {
-  genre: Genre | null
-  platform: Platform | null
+  genreId: number;
+  platformId?: number
   sortOrder: string
   searchText: string
 }
@@ -39,7 +42,7 @@ const App = () => {
         <Show above="lg">
           <GridItem area="aside" padding={2}>
             {" "}
-           <GenreList selectedGenre={gameQuery.genre} onSelectedGenre={(genre) => setGameQuery({...gameQuery, genre})}/>
+           <GenreList selectedGenreId={gameQuery.genreId} onSelectedGenre={(genre) => setGameQuery({...gameQuery, genreId: genre.id})}/>
           </GridItem>
         </Show>
 
@@ -47,7 +50,7 @@ const App = () => {
           <Box padding={5}>
           <GameHeading gameQuery={gameQuery} />
           <HStack spacing={5} marginY={5} >
-            <PlatformSelector selectedPlatform={gameQuery.platform} onSelectPlatform={(platform) => setGameQuery({...gameQuery, platform})}/>
+            <PlatformSelector selectedPlatformId={gameQuery.platformId} onSelectPlatform={(platform) => setGameQuery({...gameQuery, platformId: platform.id})}/>
             <SortSelector onSelectSortOrder={sortOrder => setGameQuery({...gameQuery, sortOrder})} />
           </HStack>
           </Box>

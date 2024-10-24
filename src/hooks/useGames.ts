@@ -3,6 +3,8 @@ import { GameQuery } from "../App";
 import { Platform } from "./usePlatforms";
 import { CACHE_KEY_GAME } from "../constant";
 import APIClient, { FetchResponse } from "../services/apiClient";
+import ms from 'ms'
+
 // Define the Game interface as before
 
 
@@ -27,31 +29,17 @@ const useGames = (gameQuery: GameQuery) =>
               apiClient
                 .getAll({
                   params:{
-                            genres:gameQuery.genre?.id, 
-                            parent_platforms:gameQuery.platform?.id,
+                            genres:gameQuery.genreId, 
+                            parent_platforms:gameQuery.platformId,
                             ordering:gameQuery.sortOrder,
                             search:gameQuery.searchText, page: pageParam
                         }
                 }),
                 getNextPageParam: (lastPage, allPages) => {
-                  return allPages.length + 1
-                }
+                  return lastPage.next ? allPages.length + 1: undefined;
+                },
+                staleTime: ms('24h') //24hours
    
   });
 
 export default useGames;
-
-// 
-//  queryFn: () => 
-//              api.Client.get<FetchResponse<Game>(CACHE_KEY_GAME, ) {
-//               params: {
-//                        genres: gameQuery.genre?.id,
-//                        parent_platforms: gameQuery.platform?.id,
-//                         ordering: gameQuery.sortOrder,
-//                         search: gameQuery.searchText,
-//                  },
-//                  })
-//                      .then(res => res.data)
-
-
-// }
